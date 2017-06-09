@@ -1,3 +1,39 @@
+- name: Use nodes_json
+  shell:
+    cat "{{ nodes_json_file }}"
+  register: nodes_json_contents
+  when: nodes_json_file is defined
+
+- set_fact:
+    nodes_json: "{{ nodes_json_contents.stdout | from_json }}"
+
+- name: Register Ironic Nodes from nodes json file
+  os_ironic:
+    auth: {}
+    auth_type: "None"
+    cloud: null
+    driver: "{{ item.pm_type }}"
+    driver_info:
+      power:
+        ipmi_username: "{{ item.pm_user }}"
+        ipmi_password: "{{ item.pm_password }}"
+        ipmi_address: "{{ item.pm_addr }}"
+        ipmi_port: "{{ item.pm_port }}"
+    ironic_url : "{{ ironic_url }}"
+    name: "{{ item.name }}"
+    nics:
+      -  mac: "{{ item.mac[0] }}"
+    properties:
+      cpus: "{{ item.cpu }}"
+      cpu_arch: "{{ item.arch }}"
+      ram: "{{ item.memory }}"
+      disk_size: "{{ item.disk }}"
+      capabilities: "{{ item.capabilities }}"
+    state: present
+    wait: yes
+  with_items: "{{ nodes_json.nodes }}"
+  when: nodes_json_file is defined
+
 - name: Register Ironic Nodes
   os_ironic:
     auth: {}

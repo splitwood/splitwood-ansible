@@ -1,5 +1,12 @@
+# Ironic API endpoint URL
 ironic_url: http://{{ ansible_default_ipv4.address }}:6385
 
+# Optional path to a nodes json file in the format used by tripleo-quickstart
+nodes_json:
+
+# List of nodes to register with Ironic. The dict structure directly
+# corresponds to what is accepted by the os_ironic module:
+# http://docs.ansible.com/ansible/os_ironic_module.html
 nodes:
   - name: testnode
     driver: pxe_ipmitool
@@ -12,7 +19,8 @@ nodes:
     nics:
       - mac: aa:bb:cc:aa:bb:cc
     properties:
-      cpu: 1
+      cpus: 1
       cpu_arch: x86_64
       ram: 8192
       disk_size: 40
+      capabilities: profile:baremetal,boot_option:local
