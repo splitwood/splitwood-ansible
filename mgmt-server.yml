@@ -1,0 +1,4 @@
+- name: Register Ironic nodes
+  hosts: mgmt-server
+  roles:
+    - ironic-node-registration

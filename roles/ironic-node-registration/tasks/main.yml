@@ -1,0 +1,14 @@
+- name: Register Ironic Nodes
+  os_ironic:
+    auth: {}
+    auth_type: "None"
+    cloud: null
+    driver: "{{ item.driver }}"
+    driver_info: "{{ item.driver_info }}"
+    ironic_url : "{{ ironic_url }}"
+    name: "{{ item.name }}"
+    nics: "{{ item.nics }}"
+    properties: "{{ item.properties }}"
+    state: present
+    wait: yes
+  with_items: "{{ nodes }}"

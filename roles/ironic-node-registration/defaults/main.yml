@@ -1,0 +1,18 @@
+ironic_url: http://{{ ansible_default_ipv4.address }}:6385
+
+nodes:
+  - name: testnode
+    driver: pxe_ipmitool
+    driver_info:
+      power:
+        ipmi_username: username
+        ipmi_password: password
+        ipmi_address: 127.0.0.1
+        ipmi_port: 6234
+    nics:
+      - mac: aa:bb:cc:aa:bb:cc
+    properties:
+      cpu: 1
+      cpu_arch: x86_64
+      ram: 8192
+      disk_size: 40
