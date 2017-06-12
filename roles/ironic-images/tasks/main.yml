@@ -1,8 +1,8 @@
 # TODO (slagle): Not a great place for installing the shade dep, but since this is the first
 # role included, go ahead and do it here.
 - name: Install python-shade2
-  command: |
-    sudo yum -y install https://trunk.rdoproject.org/centos7/current/python2-shade-1.21.0-0.20170531171812.ba0e945.el7.centos.noarch.rpm
+  shell: |
+    rpm -q python2-shade || sudo yum -y install https://trunk.rdoproject.org/centos7/current/python2-shade-1.21.0-0.20170531171812.ba0e945.el7.centos.noarch.rpm
 
 
 # why is this necessary? it should be created by the ironic-conductor service,
@@ -10,6 +10,14 @@
 - name: Create ironic httpboot directory
   file:
     path: /var/lib/ironic/httpboot
+    state: directory
+    owner: 42422
+    group: 42422
+  become: true
+
+- name: Create ironic tftpboot directory
+  file:
+    path: /var/lib/ironic/tftpboot
     state: directory
     owner: 42422
     group: 42422
