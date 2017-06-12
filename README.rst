@@ -31,6 +31,16 @@ looks like::
 The rest of the examples in the doc assume the inventory file is in the current
 directory and is simply called ``inventory``.
 
+Get playbooks and roles
+-----------------------
+
+Clone this repository::
+
+    git clone https://github.com/splitwood/splitwood-ansible.git
+
+The rest of the examples assume this repo is cloned into a
+``splitwood-ansible`` directory in the current working directory.
+
 Registering Nodes
 =================
 
