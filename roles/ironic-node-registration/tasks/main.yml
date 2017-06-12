@@ -19,6 +19,9 @@
         ipmi_password: "{{ item.pm_password }}"
         ipmi_address: "{{ item.pm_addr }}"
         ipmi_port: "{{ item.pm_port }}"
+      deploy:
+        deploy_ramdisk: file:///var/lib/ironic/images/ironic-python-agent.initramfs
+        deploy_kernel: file:///var/lib/ironic/images/ironic-python-agent.kernel
     ironic_url : "{{ ironic_url }}"
     name: "{{ item.name }}"
     nics:
