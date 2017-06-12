@@ -53,10 +53,7 @@ The rest of the examples assume this repo is cloned into a
 Registering Nodes
 =================
 
-The following command will register nodes using a nodes json file
-(``instackenv.json``) as created by tripleo-quickstart::
-
-..note::
+.. note::
 
     If using an environment created by tripleo-quickstart (or
     tripleo-virt-quickstart), you will need to first edit the nodes json file
@@ -64,6 +61,9 @@ The following command will register nodes using a nodes json file
     from the libvirt xml on the virthost. See
     https://gist.github.com/slagle/916e53d1e3ced9038872dfe4321ce60f for more
     info.
+
+The following command will register nodes using a nodes json file
+(``instackenv.json``) as created by tripleo-quickstart::
 
     ansible-playbook -i inventory splitwood-ansible/ironic-node-registration.yml -e nodes_json_file=/home/stack/instackenv.json
 
