@@ -1,0 +1,11 @@
+# Ironic API endpoint URL
+ironic_url: http://{{ ansible_default_ipv4.address }}:6385
+
+# Default hostname
+hostname: test-hostname
+
+# Default password for the user "cloud-user"
+password: redhat
+
+# ssh public key to be injected for cloud-user
+ssh_public_key: ""

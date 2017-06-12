@@ -1,0 +1,16 @@
+{
+    "availability_zone": "nova",
+    "files": [ ],
+    "hostname": "{{ hostname }}",
+    "launch_index": 0,
+    "name": "{{ hostname }}",
+    "meta": {
+        "role": "webservers",
+        "essential": "false"
+    },
+    "public_keys": {
+        "mykey": "{{ ssh_public_key }}"
+    },
+    "uuid": "{{ node_uuid.stdout }}"
+}
+

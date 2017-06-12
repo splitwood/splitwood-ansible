@@ -1,0 +1,4 @@
+- name: Provision Ironic node
+  hosts: mgmt-server
+  roles:
+    - ironic-node-provision
