@@ -20,6 +20,10 @@ directory on the mgmt-server (undercloud)::
 If you don't know where to download the image for rhel-atomic, ask around on
 irc.
 
+Install ``python2-shade`` on the mgmt-server::
+
+    sudo yum -y install https://trunk.rdoproject.org/centos7/current/python2-shade-1.21.0-0.20170531171812.ba0e945.el7.centos.noarch.rpm
+
 Inventory file
 --------------
 
