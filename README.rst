@@ -4,6 +4,21 @@ splitwood-ansible
 
 Ansible playbooks and roles for splitwood.
 
+Prerequisites
+-------------
+
+These commands require ansible to be installed. They've been tested with
+ansible 2.2.0.0.
+
+If tripleo-quickstart (or tripleo-virt-quickstart) was used to create the
+virtual environment, then there is already an ansible virtualenv installation
+that can be used on the virthost. As the non-root user you can activate the
+virtualenv by::
+
+    cd
+    source .quickstart/bin/activate
+
+
 Inventory file
 --------------
 
@@ -60,9 +75,11 @@ Provisioning Nodes
 
 The followig command will provision a node::
 
-    ansible-playbook -i inventory splitwood-ansible/ironic-node-provision.yml -e node_name=baremetal-0 -e node_ip=192.168.24.15
+    ansible-playbook -i inventory splitwood-ansible/ironic-node-provision.yml -e node_name=baremetal-0 -e node_ip=192.168.24.15 -e provisioning_nic=eth1 -e provisioning_default_route=192.168.24.1 -e provisioning_dhcp_range=192.168.24.0 -e provisioning_cidr=192.168.24.1/24
 
-Note that ``node_name`` and ``node_ip`` must be specified.
+Note that ``node_name`` and ``node_ip`` must be specified. For the other
+variables, the default values are shown. For more info see
+https://github.com/splitwood/splitwood-ansible/blob/master/roles/ironic-node-provision/defaults/main.yml
 
 The default login will be user ``cloud-user`` and password ``redhat``. The
 password along with an optional public ssh key can be specified with ansible
