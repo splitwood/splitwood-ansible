@@ -10,6 +10,11 @@ Prerequisites
 Images
 ------
 
+Create the ``/var/lib/ironic/images`` directory on the mgmt-server
+(undercloud)::
+
+    sudo mkdir /var/lib/ironic/images
+
 Download the following images and copy them to the ``/var/lib/ironic/images``
 directory on the mgmt-server (undercloud)::
 
