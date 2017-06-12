@@ -1,0 +1,2 @@
+ipa_ramdisk_image: https://slagle.fedorapeople.org/woodshed-images/ironic-python-agent.initramfs
+ipa_kernel_image: https://slagle.fedorapeople.org/woodshed-images/ironic-python-agent.kernel

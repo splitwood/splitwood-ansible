@@ -4,29 +4,6 @@ splitwood-ansible
 
 Ansible playbooks and roles for splitwood.
 
-Prerequisites
-=============
-
-Images
-------
-
-Create the ``/var/lib/ironic/images`` directory on the mgmt-server
-(undercloud)::
-
-    sudo mkdir /var/lib/ironic/images
-
-Download the following images and copy them to the ``/var/lib/ironic/images``
-directory on the mgmt-server (undercloud)::
-
-    https://slagle.fedorapeople.org/woodshed-images/ironic-python-agent.initramfs
-    https://slagle.fedorapeople.org/woodshed-images/ironic-python-agent.kernel
-    rhel-atomic-cloud-7.3.5-7.x86_64.qcow2
-
-If you don't know where to download the image for rhel-atomic, ask around on
-irc.
-
-Install ``python2-shade`` on the mgmt-server::
-
     sudo yum -y install https://trunk.rdoproject.org/centos7/current/python2-shade-1.21.0-0.20170531171812.ba0e945.el7.centos.noarch.rpm
 
 Inventory file
@@ -49,6 +26,15 @@ Clone this repository::
 
 The rest of the examples assume this repo is cloned into a
 ``splitwood-ansible`` directory in the current working directory.
+
+Images
+======
+
+The following command will download and stage the necessary images on the
+mgmt-server host. Note that the ansible variable atomic_image is required. If
+you don't know the correct url, ask around on irc::
+
+    ansible-playbook -i inventory splitwood-ansible/ironic-images.yml -e atomic_image=<ATOMIC_IMAGE_URL>
 
 Registering Nodes
 =================

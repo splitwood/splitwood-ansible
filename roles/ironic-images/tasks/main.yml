@@ -1,0 +1,46 @@
+- name: Install python-shade2
+  command: |
+    sudo yum -y install https://trunk.rdoproject.org/centos7/current/python2-shade-1.21.0-0.20170531171812.ba0e945.el7.centos.noarch.rpm
+
+
+# why is this necessary? it should be created by the ironic-conductor service,
+# but isn't for some reason
+- name: Create ironic httpboot directory
+  file:
+    path: /var/lib/ironic/httpboot
+    state: directory
+    owner: 42422
+    group: 42422
+  become: true
+
+- name: Create ironic images directory
+  file:
+    path: /var/lib/ironic/images
+    state: directory
+    owner: 42422
+    group: 42422
+  become: true
+
+- name: Download IPA ramdisk
+  get_url:
+    url: "{{ ipa_ramdisk_image }}"
+    dest: /var/lib/ironic/images/ironic-python-agent.initramfs
+    owner: 42422
+    group: 42422
+  become: true
+
+- name: Download IPA kernel
+  get_url:
+    url: "{{ ipa_kernel_image }}"
+    dest: /var/lib/ironic/images/ironic-python-agent.kernel
+    owner: 42422
+    group: 42422
+  become: true
+
+- name: Download atomic image
+  get_url:
+    url: "{{ atomic_image }}"
+    dest: /var/lib/ironic/images/rhel-atomic-cloud-7.3.5-7.x86_64.qcow2
+    owner: 42422
+    group: 42422
+  become: true
