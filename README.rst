@@ -4,6 +4,21 @@ splitwood-ansible
 
 Ansible playbooks and roles for splitwood.
 
+Prerequisites
+-------------
+
+These commands require ansible to be installed. They've been tested with
+ansible 2.2.0.0.
+
+If tripleo-quickstart (or tripleo-virt-quickstart) was used to create the
+virtual environment, then there is already an ansible virtualenv installation
+that can be used on the virthost. As the non-root user you can activate the
+virtualenv by::
+
+    cd
+    source .quickstart/bin/activate
+
+
 Inventory file
 --------------
 
