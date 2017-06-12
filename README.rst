@@ -4,8 +4,6 @@ splitwood-ansible
 
 Ansible playbooks and roles for splitwood.
 
-    sudo yum -y install https://trunk.rdoproject.org/centos7/current/python2-shade-1.21.0-0.20170531171812.ba0e945.el7.centos.noarch.rpm
-
 Inventory file
 --------------
 
