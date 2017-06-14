@@ -2,11 +2,19 @@
   shell: |
     ironic --json node-show {{ node_name }} | jq -r .uuid
   register: node_uuid
+  environment:
+    IRONIC_URL: "{{ ironic_url }}"
+    OS_AUTH_TOKEN: token
+    IRONIC_API_VERSION: 1.31
 
 - name: Get node MAC address
   shell: |
     ironic --json node-port-list {{ node_uuid.stdout }} | jq .[0].address -r
   register: node_mac
+  environment:
+    IRONIC_URL: "{{ ironic_url }}"
+    OS_AUTH_TOKEN: token
+    IRONIC_API_VERSION: 1.31
 
 - name: Create temporary directory for config-drive
   command: |
@@ -28,10 +36,28 @@
     src: user_data.j2
     dest: "{{ config_drive_dir.stdout }}/openstack/latest/user_data"
 
+- name: Add IP address to provisioning nic
+  command:
+    ip addr add {{ provisioning_cidr }} dev {{ provisioning_nic }}
+  become: true
+  ignore_errors: yes
+
 - name: Create dnsmasq host dir
   file:
     path: /var/lib/ironic/dnsmasq/host/
     state: directory
+  become: true
+
+- name: Create dnsmasq config
+  template:
+    src: config.j2
+    dest: /var/lib/ironic/dnsmasq/config
+  become: true
+
+# TODO (slagle) It should already be started, but in some cases the previous
+# config file might not yet exist.
+- name: Start dnsmasq container
+  command: docker start ironic_dnsmasq
   become: true
 
 - name: Create dnsmasq addn_hosts dir
