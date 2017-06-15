@@ -26,6 +26,7 @@
     IRONIC_URL: "{{ ironic_url }}"
     OS_AUTH_TOKEN: token
     IRONIC_API_VERSION: 1.31
+  changed_when: False
 
 - name: "Inspect node {{ node }}"
   os_ironic_inspect:
