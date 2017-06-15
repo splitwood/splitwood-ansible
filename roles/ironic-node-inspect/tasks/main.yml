@@ -1,0 +1,36 @@
+- name: Copy ironic-python-agent.kernel to httpboot for inspection
+  copy:
+    remote_src: True
+    src: /var/lib/ironic/images/ironic-python-agent.kernel
+    dest: /var/lib/ironic/httpboot/ironic-python-agent.kernel
+  become: true
+
+- name: Copy ironic-python-agent.initramfs to httpboot for inspection
+  copy:
+    remote_src: True
+    src: /var/lib/ironic/images/ironic-python-agent.initramfs
+    dest: /var/lib/ironic/httpboot/ironic-python-agent.initramfs
+  become: true
+
+- name: Create inspector.ipxe
+  template:
+    src: inspector.ipxe.j2
+    dest: /var/lib/ironic/httpboot/inspector.ipxe
+  become: true
+
+- name: Get node uuid
+  shell: |
+    ironic --json node-show {{ node_name }} | jq -r .uuid
+  register: node_uuid
+  environment:
+    IRONIC_URL: "{{ ironic_url }}"
+    OS_AUTH_TOKEN: token
+    IRONIC_API_VERSION: 1.31
+
+- name: "Inspect node {{ node }}"
+  os_ironic_inspect:
+    auth: {}
+    auth_type: "None"
+    cloud: null
+    ironic_url : "{{ ironic_url }}"
+    uuid: "{{ node_uuid.stdout }}"

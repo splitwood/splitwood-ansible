@@ -1,0 +1,4 @@
+- name: Inspect Ironic node
+  hosts: mgmt-server
+  roles:
+    - ironic-node-inspect

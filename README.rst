@@ -82,6 +82,21 @@ If not using a nodes json file, see
 https://github.com/splitwood/splitwood-ansible/blob/master/roles/ironic-node-registration/defaults/main.yml
 for specifying a yaml format of nodes data in an Ansible variable.
 
+Inspecting Nodes
+================
+
+Use the following command to inspect a node::
+
+    ansible-playbook -i inventory splitwood-ansible/ironic-node-inspect.yml -e node_name=baremetal-0
+
+Since we are not using Swift to store the inspection data, most of the data is
+currently lost. However, the basic cpu/memory/disk/cpu flags will be updated in
+Ironic directly after successful inspection.
+
+Use ``ironic node-show ...`` to see the updated properties::
+
+    ironic node-show baremetal-0
+
 Provisioning Nodes
 ==================
 

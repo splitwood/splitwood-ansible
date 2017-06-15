@@ -1,0 +1,2 @@
+# Ironic API endpoint URL
+ironic_url: http://{{ ansible_default_ipv4.address }}:6385
