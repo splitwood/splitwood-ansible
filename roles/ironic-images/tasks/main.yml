@@ -1,9 +1,9 @@
 # TODO (slagle): Not a great place for installing the shade dep, but since this is the first
 # role included, go ahead and do it here.
-- name: Install python-shade2
-  shell: |
-    rpm -q python2-shade || sudo yum -y install https://trunk.rdoproject.org/centos7/current/python2-shade-1.21.0-0.20170531171812.ba0e945.el7.centos.noarch.rpm
-
+- name: Install python2-shade
+  yum:
+    name: https://trunk.rdoproject.org/centos7/current/python2-shade-1.21.0-0.20170531171812.ba0e945.el7.centos.noarch.rpm
+    state: present
 
 # why is this necessary? it should be created by the ironic-conductor service,
 # but isn't for some reason
