@@ -6,6 +6,26 @@
     IRONIC_URL: "{{ ironic_url }}"
     OS_AUTH_TOKEN: token
     IRONIC_API_VERSION: 1.31
+  changed_when: False
+
+- name: Get node provision_state
+  shell: |
+    ironic --json node-show baremetal-0 | jq -r .provision_state
+  register: node_provision_state
+  environment:
+    IRONIC_URL: "{{ ironic_url }}"
+    OS_AUTH_TOKEN: token
+    IRONIC_API_VERSION: 1.31
+  changed_when: False
+
+- name: Set node available if needed
+  shell: |
+    ironic node-set-provision-state {{ node_name }} provide
+  environment:
+    IRONIC_URL: "{{ ironic_url }}"
+    OS_AUTH_TOKEN: token
+    IRONIC_API_VERSION: 1.31
+  when: node_provision_state.stdout != "available"
 
 - name: Get node MAC address
   shell: |
@@ -15,6 +35,7 @@
     IRONIC_URL: "{{ ironic_url }}"
     OS_AUTH_TOKEN: token
     IRONIC_API_VERSION: 1.31
+  changed_when: False
 
 - name: Create temporary directory for config-drive
   command: |
