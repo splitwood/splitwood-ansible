@@ -3,6 +3,7 @@
     cat "{{ nodes_json_file }}"
   register: nodes_json_contents
   when: nodes_json_file is defined
+  changed_when: False
 
 - set_fact:
     nodes_json: "{{ nodes_json_contents.stdout | from_json }}"
@@ -51,3 +52,4 @@
     state: present
     wait: yes
   with_items: "{{ nodes }}"
+  when: nodes != []
