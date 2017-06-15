@@ -1,0 +1,89 @@
+- name: Check IP's on provisioning nic
+  command:
+    ip -4 -o addr show dev {{ provisioning_nic }}
+  register: ip_result
+  become: true
+  changed_when: False
+
+- name: Add IP address to provisioning nic
+  command:
+    ip addr add {{ provisioning_cidr }} dev {{ provisioning_nic }}
+  register: add_ip_address
+  become: true
+  when: "'{{ provisioning_cidr }}' not in ip_result.stdout"
+
+- name: Configure inspector manage_firewall
+  ini_file:
+    dest: /var/lib/config-data/ironic_inspector/etc/ironic-inspector/inspector.conf
+    section: firewall
+    option: manage_firewall
+    value: false
+  register: manage_firewall
+  become: true
+
+- name: Configure inspector ironic auth_strategy
+  ini_file:
+    dest: /var/lib/config-data/ironic_inspector/etc/ironic-inspector/inspector.conf
+    section: ironic
+    option: auth_strategy
+    value: noauth
+  register: inspector_ironic_auth_strategy
+  become: true
+
+- name: Configure inspector ironic_url
+  ini_file:
+    dest: /var/lib/config-data/ironic_inspector/etc/ironic-inspector/inspector.conf
+    section: ironic
+    option: ironic_url
+    value: http://{{ ansible_default_ipv4.address }}:6385
+  register: inspector_ironic_url
+  become: true
+
+- name: Restart ironic_inspector
+  command: docker restart ironic_inspector
+  become: true
+  when: add_ip_address.changed or manage_firewall.changed or inspector_ironic_auth_strategy.changed or inspector_ironic_url.changed
+
+- name: Remove inspector iptables rule
+  iptables:
+    state: absent
+    chain: INPUT
+    protocol: udp
+    destination_port: 67
+    in_interface: "{{ provisioning_nic }}"
+    jump: ironic-inspector
+  become: true
+
+- name: Create dnsmasq host dir
+  file:
+    path: /var/lib/ironic/dnsmasq/host/
+    state: directory
+  register: dnsmasq_host_dir
+  become: true
+
+- name: Create dnsmasq config
+  template:
+    src: config.j2
+    dest: /var/lib/ironic/dnsmasq/config
+  register: dnsmasq_config
+  become: true
+
+- name: Create dnsmasq addn_hosts dir
+  file:
+    path: /var/lib/ironic/dnsmasq/addn_hosts/
+    state: directory
+  register: dnsmasq_addn_hosts_dir
+  become: true
+
+- name: Create dnsmasq opts file
+  template:
+    src: opts.j2
+    dest: /var/lib/ironic/dnsmasq/opts
+  register: dnsmasq_opts_file
+  become: true
+
+- name: restart dnsmasq
+  command: docker restart ironic_dnsmasq
+  become: true
+  when: dnsmasq_host_dir.changed or dnsmasq_config.changed or dnsmasq_addn_hosts_dir.changed or dnsmasq_opts_file.changed
+

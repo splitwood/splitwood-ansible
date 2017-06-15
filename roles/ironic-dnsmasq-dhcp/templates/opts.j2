@@ -5,3 +5,8 @@ tag:ff004543-a6e7-419c-9714-095a9c256051,option:server-ip-address,{{ provisionin
 tag:ff004543-a6e7-419c-9714-095a9c256051,tag:!ipxe,option:bootfile-name,undionly.kpxe
 tag:ff004543-a6e7-419c-9714-095a9c256051,tag:ipxe,option:bootfile-name,http://{{ ansible_default_ipv4.address }}:8088/boot.ipxe
 tag:ff004543-a6e7-419c-9714-095a9c256051,option:tftp-server,{{ ansible_default_ipv4.address }}
+
+tag:tag1,option:server-ip-address,{{ provisioning_default_route }}
+tag:tag1,tag:!ipxe,option:bootfile-name,undionly.kpxe
+tag:tag1,tag:ipxe,option:bootfile-name,http://{{ ansible_default_ipv4.address }}:8088/inspector.ipxe
+tag:tag1,option:tftp-server,{{ ansible_default_ipv4.address }}

@@ -1,2 +1,4 @@
 interface={{ provisioning_nic }}
 dhcp-range=set:tag0,{{ provisioning_dhcp_range }},static,86400s
+dhcp-range=set:tag1,{{ inspection_dhcp_range }},29
+dhcp-match=ipxe,175

@@ -49,6 +49,18 @@ you don't know the correct url, ask around on irc::
 
     ansible-playbook -i inventory splitwood-ansible/ironic-images.yml -e atomic_image=<ATOMIC_IMAGE_URL>
 
+Configure DHCP on the provisioning network
+==========================================
+
+The provisioning network needs to be configured in order to PXE boot nodes via
+DHCP.
+
+See https://github.com/splitwood/splitwood-ansible/blob/master/roles/ironic-dnsmasq-dhcp/defaults/main.yml for the ansible configuration variables that need to be configured. If using a tripleo-virt-quickstart environment the defaults should just work.
+
+Run the playbook to apply the configuration::
+
+    ansible-playbook -i inventory splitwood-ansible/ironic-dnsmasq-dhcp.yml [-e var=value] ...
+
 Registering Nodes
 =================
 

@@ -1,0 +1,20 @@
+# Nic to which dnsmasq will bind for the provisioning network
+provisioning_nic: eth1
+
+# Default route for the provisioning subnet
+# In most cases, this is the IP assigned to the provisoning nic
+# This will be configured in dnsmasq
+provisioning_default_route: 192.168.24.1
+#
+# This IP addreess (in cidr notation) is the IP address that will be assigned
+# to provisioning_nic. In most cases, the IP address portion should match
+# provisioning_default_route.
+provisioning_cidr: 192.168.24.1/24
+
+# Dhcp range configuration for dnsmasq. This should correspond to to the
+# provisioning_cidr and provisioning_default_route values
+provisioning_dhcp_range: 192.168.24.0
+
+inspection_dhcp_range: 192.168.24.101,192.168.24.200
+
+

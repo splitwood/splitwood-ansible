@@ -1,0 +1,4 @@
+- name: Configure Ironic dnsmasq DHCP
+  hosts: mgmt-server
+  roles:
+    - ironic-dnsmasq-dhcp

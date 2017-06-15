@@ -36,30 +36,6 @@
     src: user_data.j2
     dest: "{{ config_drive_dir.stdout }}/openstack/latest/user_data"
 
-- name: Add IP address to provisioning nic
-  command:
-    ip addr add {{ provisioning_cidr }} dev {{ provisioning_nic }}
-  become: true
-  ignore_errors: yes
-
-- name: Create dnsmasq host dir
-  file:
-    path: /var/lib/ironic/dnsmasq/host/
-    state: directory
-  become: true
-
-- name: Create dnsmasq config
-  template:
-    src: config.j2
-    dest: /var/lib/ironic/dnsmasq/config
-  become: true
-
-- name: Create dnsmasq addn_hosts dir
-  file:
-    path: /var/lib/ironic/dnsmasq/addn_hosts/
-    state: directory
-  become: true
-
 - name: Configure dnsmasq host template
   template:
     src: host.j2
@@ -70,12 +46,6 @@
   template:
     src: addn_hosts.j2
     dest: /var/lib/ironic/dnsmasq/addn_hosts/addn_hosts-{{ node_uuid.stdout }}
-  become: true
-
-- name: Create dnsmasq opts file
-  template:
-    src: opts.j2
-    dest: /var/lib/ironic/dnsmasq/opts
   become: true
 
 - name: restart dnsmasq
