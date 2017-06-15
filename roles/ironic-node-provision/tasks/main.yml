@@ -65,3 +65,4 @@
       root_gb: 40
     uuid: "{{ node_uuid.stdout }}"
     config_drive: "{{ config_drive_dir.stdout }}"
+    wait: yes
