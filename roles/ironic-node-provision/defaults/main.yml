@@ -2,7 +2,8 @@
 ironic_url: http://{{ ansible_default_ipv4.address }}:6385
 
 # Default hostname
-hostname: test-hostname
+# Will default to Ironic node name if not defined
+# hostname: localhost.localdomain
 
 # Default password for the user "cloud-user"
 password: redhat

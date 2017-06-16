@@ -1,9 +1,9 @@
 {
     "availability_zone": "nova",
     "files": [ ],
-    "hostname": "{{ hostname }}",
+    "hostname": "{{ hostname | default(node_name) }}",
     "launch_index": 0,
-    "name": "{{ hostname }}",
+    "name": "{{ hostname | default(node_name) }}",
     "meta": {
         "role": "webservers",
         "essential": "false"
