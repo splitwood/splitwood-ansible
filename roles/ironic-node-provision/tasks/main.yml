@@ -10,7 +10,7 @@
 
 - name: Get node provision_state
   shell: |
-    ironic --json node-show baremetal-0 | jq -r .provision_state
+    ironic --json node-show {{ node_name }} | jq -r .provision_state
   register: node_provision_state
   environment:
     IRONIC_URL: "{{ ironic_url }}"
