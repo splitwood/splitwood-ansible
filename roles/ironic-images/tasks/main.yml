@@ -4,6 +4,7 @@
   yum:
     name: https://trunk.rdoproject.org/centos7/current/python2-shade-1.21.0-0.20170531171812.ba0e945.el7.centos.noarch.rpm
     state: present
+  become: true
 
 # why is this necessary? it should be created by the ironic-conductor service,
 # but isn't for some reason
