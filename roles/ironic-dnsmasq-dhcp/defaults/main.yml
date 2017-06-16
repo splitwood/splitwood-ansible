@@ -15,6 +15,7 @@ provisioning_cidr: 192.168.24.1/24
 # provisioning_cidr and provisioning_default_route values
 provisioning_dhcp_range: 192.168.24.0
 
+# Dhcp range configuring for inspection in dnsmasq. Only IP's from this range
+# will be given out during inspection. When provisioning nodes, do not use IP's
+# from the inspection range.
 inspection_dhcp_range: 192.168.24.101,192.168.24.200
-
-
