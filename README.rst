@@ -89,13 +89,26 @@ Use the following command to inspect a node::
 
     ansible-playbook -i inventory splitwood-ansible/ironic-node-inspect.yml -e node_name=baremetal-0
 
-Since we are not using Swift to store the inspection data, most of the data is
-currently lost. However, the basic cpu/memory/disk/cpu flags will be updated in
-Ironic directly after successful inspection.
+The basic cpu/memory/disk/cpu_flags/etc properties will be updated in Ironic
+directly after successful inspection. The rest of the inspection data is stored
+on the mgmt-server filesystem. You can get the path of the stored data by
+looking in the ``extra`` field of the ironic node.
 
 Use ``ironic node-show ...`` to see the updated properties::
 
     ironic node-show baremetal-0
+
+Example output::
+
+    # <snip>
+		| extra                  | {u'inspector_data_path': u'/var/lib/ironic/inspector-store-           |
+		|                        | local/d1fa1a73-fa0a-4c38-b32e-caead6b3549a'}                          |
+    # <snip>
+
+Then look at
+``/var/lib/ironic/inspector-store-local/d1fa1a73-fa0a-4c38-b32e-caead6b3549a``
+to see the stored data.
+
 
 Provisioning Nodes
 ==================
