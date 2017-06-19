@@ -73,7 +73,11 @@
   command: docker restart ironic_dnsmasq
   become: true
 
-- name: "Provision node {{ node }}"
+- name: name: Output provisioned node name
+  debug:
+    msg: "Going to provision {{ node_name }}"
+
+- name: "Provision node"
   os_ironic_node:
     auth: {}
     auth_type: "None"

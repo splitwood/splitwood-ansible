@@ -28,7 +28,11 @@
     IRONIC_API_VERSION: 1.31
   changed_when: False
 
-- name: "Inspect node {{ node }}"
+- name: Output inspected node name
+  debug:
+    msg: "Going to inspect {{ node_name }}"
+
+- name: "Inspect node"
   os_ironic_inspect:
     auth: {}
     auth_type: "None"
