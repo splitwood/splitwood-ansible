@@ -6,6 +6,13 @@
     state: present
   become: true
 
+# Same TODO as above
+- name: Install jq
+  yum:
+    name: jq
+    state: present
+  become: true
+
 # why is this necessary? it should be created by the ironic-conductor service,
 # but isn't for some reason
 - name: Create ironic httpboot directory
