@@ -9,6 +9,7 @@
     nodes_json: "{{ nodes_json_contents.stdout | from_json }}"
 
 - name: Register Ironic Nodes from nodes json file
+  no_log: True
   os_ironic:
     auth: {}
     auth_type: "None"
