@@ -6,6 +6,14 @@
     state: present
   become: true
 
+# It's currently missing a dependency, install it manually
+# https://review.rdoproject.org/r/7119
+- name: Install python-futures
+  yum:
+    name: python-futures
+    state: present
+  become: true
+
 # Same TODO as above
 - name: Install jq
   yum:
