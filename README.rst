@@ -110,6 +110,9 @@ Then look at
 ``/var/lib/ironic/inspector-store-local/d1fa1a73-fa0a-4c38-b32e-caead6b3549a``
 to see the stored data.
 
+While inspection runs, you can see a log of its progress using:
+
+    sudo docker logs -f ironic_inspector
 
 Provisioning Nodes
 ==================
@@ -125,3 +128,7 @@ https://github.com/splitwood/splitwood-ansible/blob/master/roles/ironic-node-pro
 The default login will be user ``cloud-user`` and password ``redhat``. The
 password along with an optional public ssh key can be specified with ansible
 variables. See https://github.com/splitwood/splitwood-ansible/blob/master/roles/ironic-node-provision/defaults/main.yml.
+
+While provisioning runs, you can see a log of its progress using:
+
+    sudo docker logs -f ironic_conductor
