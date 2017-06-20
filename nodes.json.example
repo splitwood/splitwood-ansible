@@ -1,0 +1,36 @@
+{
+  "nodes": [
+    {
+      "name": "node1",
+      "pm_password": "ipmi_secret",
+      "pm_type": "pxe_ipmitool",
+      "pm_user": "root",
+      "pm_addr": "ipmi.node1.example.com",
+      "pm_port": "623",
+      "mac": [
+        "00:11:22:33:44:55"
+      ],
+      "cpu": "2",
+      "memory": "4096",
+      "disk": "40",
+      "arch": "x86_64",
+      "capabilities": "profile:baremetal,boot_option:local"
+    },
+    {
+      "name": "node2",
+      "pm_password": "ipmi_secret",
+      "pm_type": "pxe_ipmitool",
+      "pm_user": "root",
+      "pm_addr": "ipmi.node2.example.com",
+      "pm_port": "623",
+      "mac": [
+        "00:11:22:33:44:56"
+      ],
+      "cpu": "2",
+      "memory": "4096",
+      "disk": "40",
+      "arch": "x86_64",
+      "capabilities": "profile:baremetal,boot_option:local"
+    }
+  ]
+}

@@ -81,6 +81,7 @@ The following command will register nodes using a nodes json file
 If not using a nodes json file, see
 https://github.com/splitwood/splitwood-ansible/blob/master/roles/ironic-node-registration/defaults/main.yml
 for specifying a yaml format of nodes data in an Ansible variable.
+n example is provided in ``nodes.json.example``, copy and edit as needed.
 
 Inspecting Nodes
 ================
