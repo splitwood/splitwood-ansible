@@ -33,7 +33,13 @@ class OpenshiftInventory(object):
         else:
             self.inventory = self.empty_inventory()
 
-        print json.dumps(self.inventory)
+        print(
+            json.dumps(
+                obj=self.inventory,
+                sort_keys=self.args.pretty,
+                indent=(4 if self.args.pretty else None),
+            )
+        )
 
     def ironic_inventory(self):
         inventory = {
@@ -57,6 +63,14 @@ class OpenshiftInventory(object):
                 'hostvars': {}
             }
         }
+        if (
+            not 'IRONIC_API_VERSION' in os.environ or
+            not 'OS_AUTH_TOKEN' in os.environ or
+            not 'IRONIC_URL' in os.environ
+        ):
+            raise RuntimeError(
+                'Please correctly set the env for Ironic'
+            )
         kwargs = {
             'os_ironic_api_version': os.environ['IRONIC_API_VERSION'],
             'os_auth_token': os.environ['OS_AUTH_TOKEN'],
@@ -197,9 +211,28 @@ class OpenshiftInventory(object):
     # Read the command line args passed to the script.
     def read_cli_args(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument('--list', action='store_true')
-        parser.add_argument('--host', action='store')
-        parser.add_argument('--examplelist', action='store_true')
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument(
+            '--list',
+            action='store_true',
+            help='Inventory from Ironic',
+        )
+        group.add_argument(
+            '--host',
+            action='store',
+            help='Not implemented!'
+        )
+        group.add_argument(
+            '--examplelist',
+            action='store_true',
+            help='Example inventory for testing',
+        )
+        parser.add_argument(
+            '--pretty',
+            action='store_true',
+            default=False,
+            help='Pretty-print (default: False)'
+        )
         self.args = parser.parse_args()
 
 # Get the inventory.
