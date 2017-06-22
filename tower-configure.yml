@@ -1,0 +1,4 @@
+- name: Configure Tower for Splitwood
+  hosts: tower-server
+  roles:
+    - tower-configure

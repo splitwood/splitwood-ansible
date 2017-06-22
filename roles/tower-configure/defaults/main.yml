@@ -1,0 +1,6 @@
+organization: Default
+project: Splitwood Openshift
+credentials: Splitwood Credentials
+inventory: Splitwood Inventory
+group: Ironic provisioned hosts
+script: Dynamic inventory from Ironic

@@ -1,0 +1,54 @@
+- name: Install tower-cli
+  yum:
+    name: python2-ansible-tower-cli
+    state: present
+  become: true
+
+- name: Add tower organization
+  tower_organization:
+    name: "{{ organization }}"
+    state: present
+
+- name: Add tower project
+  tower_project:
+    name: "{{ project }}"
+    description: "Deploy Openshift on baremetal hosts provisioned by Ironic"
+    scm_type: "git"
+    scm_url: "https://github.com/splitwood/openshift-ansible.git"
+    scm_branch: "glusterfs-fixes-too"
+    organization: "{{ organization }}"
+    state: present
+
+- name: Add private key for hosts
+  tower_credential:
+    name: "{{ credentials }}"
+    description: "Hosts credentials for Splitwood"
+    kind: ssh
+    project: "{{ project }}"
+    organization: "{{ organization }}"
+    ssh_key_data: /root/.ssh/id_rsa 
+    state: present
+
+- name: Add ironic hosts inventory
+  tower_inventory:
+    name: "{{ inventory }}"
+    description: "Hosts inventory for Splitwood"
+    organization: "{{ organization }}"
+    state: present
+
+- name: Copy the dynamic inventory script
+  template:
+    src: dyninv.py.j2
+    dest: /tmp/dyninv.py
+
+# tower_inventory_script is missing!!!
+- name: Add dynamic inventory script
+  command: /usr/bin/tower-cli inventory_script create --name {{ script|quote }} --force-on-exists --organization {{ organization|quote }} --script @/tmp/dyninv.py
+
+- debug:
+    msg: "{{ hostvars['mgmt-server']['ansible_host']}}"
+
+
+# tower_group doesn't seem to work as exepected with inventory script
+- name: Add tower group
+  command: /usr/bin/tower-cli group create --name {{ group|quote }} --force-on-exists --inventory {{ inventory|quote }} --source custom --source-script {{ script|quote }} --source-vars="{ \"IRONIC_API_VERSION\":\"1.31\",  \"OS_AUTH_TOKEN\":\"token\", \"IRONIC_URL\":\"http://{{ hostvars['mgmt-server']['ansible_host']|quote }}:6385\" }"
