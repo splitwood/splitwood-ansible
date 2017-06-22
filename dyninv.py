@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import argparse
+import urllib2
 
 from ironicclient import client
 
@@ -14,6 +15,7 @@ class OpenshiftInventory(object):
 
     OPENSHIFT_IMAGE_TAG = 'v3.6.0-alpha.1'
     OPENSHIFT_DEPLOYMENT_T = 'origin'
+    IRONIC_INVENTORY_HTTP_PORT = '8000'
 
     def __init__(self):
         self.inventory = {}
@@ -64,9 +66,9 @@ class OpenshiftInventory(object):
             }
         }
         if (
-            not 'IRONIC_API_VERSION' in os.environ or
-            not 'OS_AUTH_TOKEN' in os.environ or
-            not 'IRONIC_URL' in os.environ
+            'IRONIC_API_VERSION' not in os.environ or
+            'OS_AUTH_TOKEN' not in os.environ or
+            'IRONIC_URL' not in os.environ
         ):
             raise RuntimeError(
                 'Please correctly set the env for Ironic'
@@ -85,51 +87,56 @@ class OpenshiftInventory(object):
         ]
         for n in ironic_nodes:
             node = ironic.node.get(n['uuid'])
-            inspector_data_path = node.extra['inspector_data_path']
             is_master = node.resource_class == 'openshift_master'
-            if inspector_data_path:
-                with open(inspector_data_path) as inspect_file:
-                    inspect_data = json.load(inspect_file)
-                    # TODO: let the user explictly declare it somehow
-                    node_address = [
-                        inspect_data['all_interfaces'][i]['ip']
-                        for i in inspect_data['all_interfaces']
-                        if not inspect_data['all_interfaces'][i]['pxe'] and
-                        inspect_data['all_interfaces'][i]['ip']
-                    ][0]
-                    root_disk = inspect_data['root_disk']['name']
-                    glusterfs_devices = [
-                        d['name']
-                        for d in inspect_data['inventory']['disks']
-                        if d['name'] != root_disk
-                    ]
-                    inventory['group']['hosts'].append(node_address)
-                    inventory['nodes'].append(node_address)
-                    inventory['_meta']['hostvars'][node_address] = {}
-                    if is_master:
-                        inventory['masters'].append(node_address)
-                        inventory['etcd'].append(node_address)
-                        inventory['_meta']['hostvars'][node_address][
-                            'openshift_schedulable'
-                        ] = False
-                        inventory['_meta']['hostvars'][node_address][
-                            'master'
-                        ] = True
-                        inventory['_meta']['hostvars'][node_address][
-                            'storage'
-                        ] = True
-                    else:
-                        inventory['_meta']['hostvars'][node_address][
-                            'openshift_schedulable'
-                        ] = True
-                        inventory['_meta']['hostvars'][node_address][
-                            'node_labels'
-                        ] = {'region': 'infra'}
-                    if glusterfs_devices:
-                        inventory['glusterfs'].append(node_address)
-                        inventory['_meta']['hostvars'][node_address][
-                            'glusterfs_devices'
-                        ] = glusterfs_devices
+            response = urllib2.urlopen(
+                '{proto}:{server}:{port}/{uuid}'.format(
+                    proto='http',
+                    server=os.environ['IRONIC_URL'].split(':')[1],
+                    port=self.IRONIC_INVENTORY_HTTP_PORT,
+                    uuid=n['uuid'],
+                )
+            )
+            inspect_data = json.load(response)
+            # TODO: let the user explictly declare it somehow
+            node_address = [
+                inspect_data['all_interfaces'][i]['ip']
+                for i in inspect_data['all_interfaces']
+                if not inspect_data['all_interfaces'][i]['pxe'] and
+                inspect_data['all_interfaces'][i]['ip']
+            ][0]
+            root_disk = inspect_data['root_disk']['name']
+            glusterfs_devices = [
+                d['name']
+                for d in inspect_data['inventory']['disks']
+                if d['name'] != root_disk
+            ]
+            inventory['group']['hosts'].append(node_address)
+            inventory['nodes'].append(node_address)
+            inventory['_meta']['hostvars'][node_address] = {}
+            if is_master:
+                inventory['masters'].append(node_address)
+                inventory['etcd'].append(node_address)
+                inventory['_meta']['hostvars'][node_address][
+                    'openshift_schedulable'
+                ] = False
+                inventory['_meta']['hostvars'][node_address][
+                    'master'
+                ] = True
+                inventory['_meta']['hostvars'][node_address][
+                    'storage'
+                ] = True
+            else:
+                inventory['_meta']['hostvars'][node_address][
+                    'openshift_schedulable'
+                ] = True
+                inventory['_meta']['hostvars'][node_address][
+                    'node_labels'
+                ] = {'region': 'infra'}
+            if glusterfs_devices:
+                inventory['glusterfs'].append(node_address)
+                inventory['_meta']['hostvars'][node_address][
+                    'glusterfs_devices'
+                ] = glusterfs_devices
         # check if it satisfies minimum requirements for glusterfs,
         # otherwise filter out
         if len(inventory['glusterfs']) < 3:
