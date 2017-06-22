@@ -199,6 +199,7 @@ class OpenshiftInventory(object):
         parser = argparse.ArgumentParser()
         parser.add_argument('--list', action='store_true')
         parser.add_argument('--host', action='store')
+        parser.add_argument('--examplelist', action='store_true')
         self.args = parser.parse_args()
 
 # Get the inventory.
