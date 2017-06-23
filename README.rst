@@ -143,7 +143,10 @@ The following command will configure Tower to be ready to deploy Openshift::
     ansible-playbook -i inventory splitwood-ansible/tower-configure.yml
 
 This job will deploy Openshift on the nodes provisioned by Ironic. All the nodes tagged in Ironic with ``resource_class='openshift_master'`` will be deployed as Openshift master nodes.
-Other nodes will be deployed as worker nodes. This job will also try to deploy an hyperconverged GlusterFS storage on the worker nodes: this requires at least three worker nodes with at least an additional disk for GlusterFS on each involved host; if that requirements are not met, GlusterFS configuration will be skipt.
+Other nodes will be deployed as worker nodes.
+
+This job will also try to deploy an hyperconverged GlusterFS storage on the worker nodes: this requires at least three worker nodes with at least an additional disk for GlusterFS on each involved host; if that requirements are not met, GlusterFS configuration will be skipt.
+
 Tower dynamic inventory has to be able to access the result of Ironic introspection but they are simply saved as files under ``/var/lib/ironic/inspector-store-local`` since we are not using Swift for that.
 Splitwood dynamic inventory script is currently expecting that directory to be shared over http; the simplest option is::
 
