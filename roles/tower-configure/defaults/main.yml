@@ -4,3 +4,4 @@ credentials: Splitwood Credentials
 inventory: Splitwood Inventory
 group: Ironic provisioned hosts
 script: Dynamic inventory from Ironic
+job_template: Splitwood deploy Openshift
