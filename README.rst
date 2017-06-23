@@ -22,10 +22,11 @@ virtualenv by::
 Inventory file
 --------------
 
-Create an ansible inventory file for the ``mgmt-server`` host. An example
+Create an ansible inventory file for the ``mgmt-server`` and ``tower-server`` hosts. An example
 looks like::
 
     mgmt-server ansible_host=192.168.23.18 ansible_port=22 ansible_ssh_private_key_file=/home/centos/.quickstart/id_rsa_undercloud ansible_user=stack
+    tower-server ansible_host=192.168.23.18 ansible_port=22 ansible_ssh_private_key_file=/home/centos/.quickstart/id_rsa_undercloud ansible_user=stack
 
 The rest of the examples in the doc assume the inventory file is in the current
 directory and is simply called ``inventory``.
@@ -132,3 +133,19 @@ variables. See https://github.com/splitwood/splitwood-ansible/blob/master/roles/
 While provisioning runs, you can see a log of its progress using:
 
     sudo docker logs -f ironic_conductor
+
+Configuring Tower to deploy Openshift
+=====================================
+
+Tower has to be installed on a server following the [Ansible Tower Quick Installation Guide](http://docs.ansible.com/ansible-tower/latest/html/quickinstall/index.html) and the tower server has to be had to our inventory.
+The following command will configure Tower to be ready to deploy Openshift::
+
+    ansible-playbook -i inventory splitwood-ansible/tower-configure.yml
+
+This job will deploy Openshift on the nodes provisioned by Ironic. All the nodes tagged in Ironic with ``resource_class='openshift_master'`` will be deployed as Openshift master nodes.
+Other nodes will be deployed as worker nodes. This job will also try to deploy an hyperconverged GlusterFS storage on the worker nodes: this requires at least three worker nodes with at least an additional disk for GlusterFS on each involved host; if that requirements are not met, GlusterFS configuration will be skipt.
+Tower dynamic inventory has to be able to access the result of Ironic introspection but they are simply saved as files under ``/var/lib/ironic/inspector-store-local`` since we are not using Swift for that.
+Splitwood dynamic inventory script is currently expecting that directory to be shared over http; the simplest option is::
+
+    cd /var/lib/ironic/inspector-store-local
+    python -m SimpleHTTPServer 8000
