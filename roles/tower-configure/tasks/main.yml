@@ -4,6 +4,18 @@
     state: present
   become: true
 
+- name: Install Openstack repo
+  yum:
+    name: centos-release-openstack
+    state: present
+  become: true
+
+- name: Install python client for Ironic
+  yum:
+    name: python-ironicclient
+    state: present
+  become: true
+
 - name: Create a temporary working folder
   tempfile:
     state: directory
