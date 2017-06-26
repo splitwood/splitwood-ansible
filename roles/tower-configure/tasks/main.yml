@@ -4,6 +4,11 @@
     state: present
   become: true
 
+- name: Create a temporary working folder
+  tempfile:
+    state: directory
+  register: tmp_folder
+
 - name: Add tower organization
   tower_organization:
     name: "{{ organization }}"
@@ -19,6 +24,12 @@
     organization: "{{ organization }}"
     state: present
 
+- name: Copy ssh key
+  copy:
+    src: "{{ ansible_ssh_private_key_file }}"
+    dest: "{{ tmp_folder['path'] }}/id_rsa"
+    mode: 0600
+
 - name: Add private key for hosts
   tower_credential:
     name: "{{ credentials }}"
@@ -26,7 +37,7 @@
     kind: ssh
     project: "{{ project }}"
     organization: "{{ organization }}"
-    ssh_key_data: /root/.ssh/id_rsa 
+    ssh_key_data: "{{ tmp_folder['path'] }}/id_rsa"
     state: present
 
 - name: Add ironic hosts inventory
@@ -39,15 +50,11 @@
 - name: Copy the dynamic inventory script
   template:
     src: dyninv.py.j2
-    dest: /tmp/dyninv.py
+    dest: "{{ tmp_folder['path'] }}/dyninv.py"
 
 # tower_inventory_script is missing!!!
 - name: Add dynamic inventory script
-  command: /usr/bin/tower-cli inventory_script create --name {{ script|quote }} --force-on-exists --organization {{ organization|quote }} --script @/tmp/dyninv.py
-
-- debug:
-    msg: "{{ hostvars['mgmt-server']['ansible_host']}}"
-
+  command: /usr/bin/tower-cli inventory_script create --name {{ script|quote }} --force-on-exists --organization {{ organization|quote }} --script @"{{ tmp_folder['path'] }}/dyninv.py"
 
 # tower_group doesn't seem to work as exepected with inventory script
 - name: Add tower group
@@ -59,6 +66,11 @@
     job_type: run
     inventory: "{{ inventory }}"
     project: "{{ project }}"
-    playbook: playbooks/byo/config.yml 
+    playbook: playbooks/byo/config.yml
     machine_credential: "{{ credentials }}"
     state: present
+
+- name: Clean temporary directory
+  file:
+    state: absent
+    path: "{{ tmp_folder['path'] }}/"
