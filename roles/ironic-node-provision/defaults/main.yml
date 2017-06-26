@@ -10,3 +10,7 @@ password: redhat
 
 # ssh public key to be injected for cloud-user
 ssh_public_key: ""
+
+# Whether to disable DHCP on the provisioning network after the provisioning is
+# completed
+disable_provisioning_dhcp: False

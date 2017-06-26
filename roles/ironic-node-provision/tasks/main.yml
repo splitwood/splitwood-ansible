@@ -91,3 +91,22 @@
     uuid: "{{ node_uuid.stdout }}"
     config_drive: "{{ config_drive_dir.stdout }}"
     wait: yes
+
+- name: Remove initial provisioning network DHCP configuration
+  file:
+    path: /var/lib/ironic/dnsmasq/host/host-{{ node_uuid.stdout }}
+    state: absent
+  when: disable_provisioning_dhcp
+  become: true
+
+- name: Configure provisioning network DHCP to ignore host
+  template:
+    src: host-disable-dhcp.j2
+    dest: /var/lib/ironic/dnsmasq/host/host-disable-dhcp-{{ node_uuid.stdout }}
+  when: disable_provisioning_dhcp
+  become: true
+
+- name: SIGHUP dnsmasq
+  command: docker kill -s SIGHUP ironic_dnsmasq
+  when: disable_provisioning_dhcp
+  become: true
