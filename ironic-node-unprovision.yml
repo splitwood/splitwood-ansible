@@ -1,0 +1,4 @@
+- name: Unprovision Ironic node
+  hosts: mgmt-server
+  roles:
+    - ironic-node-unprovision

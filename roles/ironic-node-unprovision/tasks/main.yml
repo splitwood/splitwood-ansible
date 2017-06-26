@@ -1,0 +1,46 @@
+- name: Get node uuid
+  shell: |
+    ironic --json node-show {{ node_name }} | jq -r .uuid
+  register: node_uuid
+  environment:
+    IRONIC_URL: "{{ ironic_url }}"
+    OS_AUTH_TOKEN: token
+    IRONIC_API_VERSION: 1.31
+  changed_when: False
+
+- name: Remove previous disabled provisioning network dhcp config
+  file:
+    path: /var/lib/ironic/dnsmasq/host/host-disable-dhcp-{{ node_uuid.stdout }}
+    state: absent
+  become: true
+
+- name: Remove dnsmasq host template
+  file:
+    path: /var/lib/ironic/dnsmasq/host/host-{{ node_uuid.stdout }}
+    state: absent
+  become: true
+
+- name: Remove dnsmasq addn_hosts template
+  file:
+    path: /var/lib/ironic/dnsmasq/addn_hosts/addn_hosts-{{ node_uuid.stdout }}
+    state: absent
+  become: true
+
+- name: SIGHUP dnsmasq
+  command: docker kill -s SIGHUP ironic_dnsmasq
+  become: true
+
+- name: Output provisioned node name
+  debug:
+    msg: "Going to provision {{ node_name }}"
+
+- name: "Unprovision node"
+  os_ironic_node:
+    auth: {}
+    auth_type: "None"
+    cloud: null
+    ironic_url : "{{ ironic_url }}"
+    instance_info: {}
+    uuid: "{{ node_uuid.stdout }}"
+    state: absent
+    wait: yes
