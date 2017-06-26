@@ -138,6 +138,13 @@ Configuring Tower to deploy Openshift
 =====================================
 
 Tower has to be installed on a server following the [Ansible Tower Quick Installation Guide](http://docs.ansible.com/ansible-tower/latest/html/quickinstall/index.html) and the tower server has to be had to our inventory.
+
+On the tower host create ``~/.tower_cli.cfg`` with the tower credentials, something like::
+
+    [general]
+    username = admin
+    password = password
+
 The following command will configure Tower to be ready to deploy Openshift::
 
     ansible-playbook -i inventory splitwood-ansible/tower-configure.yml
