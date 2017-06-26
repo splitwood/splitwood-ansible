@@ -57,6 +57,12 @@
     src: user_data.j2
     dest: "{{ config_drive_dir.stdout }}/openstack/latest/user_data"
 
+- name: Remove previous disabled provisioning network dhcp config
+  file:
+    path: /var/lib/ironic/dnsmasq/host/host-disable-dhcp-{{ node_uuid.stdout }}
+    state: absent
+  become: true
+
 - name: Configure dnsmasq host template
   template:
     src: host.j2
