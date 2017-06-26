@@ -70,7 +70,7 @@
 
 # tower_group doesn't seem to work as exepected with inventory script
 - name: Add tower group
-  command: /usr/bin/tower-cli group create --name {{ group|quote }} --force-on-exists --inventory {{ inventory|quote }} --source custom --source-script {{ script|quote }} --source-vars="{ \"IRONIC_API_VERSION\":\"1.31\",  \"OS_AUTH_TOKEN\":\"token\", \"IRONIC_URL\":\"http://{{ hostvars['mgmt-server']['ansible_host']|quote }}:6385\" }"
+  command: /usr/bin/tower-cli group create --name {{ group|quote }} --force-on-exists --inventory {{ inventory|quote }}  --overwrite true  --overwrite-vars true  --update-on-launch true  --source custom --source-script {{ script|quote }} --source-vars="{ \"IRONIC_API_VERSION\":\"1.31\",  \"OS_AUTH_TOKEN\":\"token\", \"IRONIC_URL\":\"http://{{ hostvars['mgmt-server']['ansible_host']|quote }}:6385\" }"
 
 - name: Create Splitwood job template
   tower_job_template:
