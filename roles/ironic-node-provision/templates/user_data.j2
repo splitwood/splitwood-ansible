@@ -1,4 +1,15 @@
 #cloud-config
-password: {{ password }}
-chpasswd: { expire: False }
+disable_root: false
+users:
+  - name: root
+    ssh-authorized-keys:
+      - {{ ssh_public_key }}
 ssh_pwauth: True
+chpasswd:
+  list: |
+    root: {{ password }}
+  expire: False
+bootcmd:
+  - if grep -Gq "^\s*PermitRootLogin" /etc/ssh/sshd_config; then sed -re  "s/^\s*(PermitRootLogin)\s+(yes|no|without-password)/\\1 yes/" -i.$(date -u +%Y%m%d%H%M%S) /etc/ssh/sshd_config; else echo "PermitRootLogin yes" >> /etc/ssh/sshd_config; fi
+runcmd:
+  - systemctl restart sshd &
