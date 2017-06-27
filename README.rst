@@ -120,13 +120,13 @@ Provisioning Nodes
 
 The followig command will provision a node::
 
-    ansible-playbook -i inventory splitwood-ansible/ironic-node-provision.yml -e node_name=baremetal-0 -e node_ip=192.168.24.15
+    ansible-playbook -i inventory splitwood-ansible/ironic-node-provision.yml -e node_name=baremetal-0 -e node_ip=192.168.24.15 -e $(cat ~/.ssh/id_rsa.pub)
 
 Note that ``node_name`` and ``node_ip`` must be specified. For the other
 variables, the default values are shown. For more info see
 https://github.com/splitwood/splitwood-ansible/blob/master/roles/ironic-node-provision/defaults/main.yml
 
-The default login will be user ``cloud-user`` and password ``redhat``. The
+The default login will be user ``root`` and password ``redhat``. The
 password along with an optional public ssh key can be specified with ansible
 variables. See https://github.com/splitwood/splitwood-ansible/blob/master/roles/ironic-node-provision/defaults/main.yml.
 
