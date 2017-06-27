@@ -47,7 +47,7 @@
 # resource_class is not available in os_ironic module
 - name: Set resource_class
   shell: |
-    ironic node-update "{{ item.name }}" replace resource_class="{{ item.resource_class|default(None) }}"
+    ironic node-update "{{ item.name }}" replace resource_class="{{ item.resource_class|default("None") }}"
   environment:
     IRONIC_URL: "{{ ironic_url }}"
     OS_AUTH_TOKEN: token
