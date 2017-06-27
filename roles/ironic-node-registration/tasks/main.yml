@@ -9,6 +9,10 @@
     nodes_json: "{{ nodes_json_contents.stdout | from_json }}"
   when: nodes_json_file is defined
 
+- set_fact:
+    nodes_json: "{{ nodes_json_text | from_json }}"
+  when: nodes_json_text is defined
+
 - name: Register Ironic Nodes from nodes json file
   no_log: True
   os_ironic:
@@ -38,7 +42,7 @@
     state: present
     wait: yes
   with_items: "{{ nodes_json.nodes }}"
-  when: nodes_json_file is defined
+  when: (nodes_json_file is defined) or (nodes_json_text is defined) 
 
 - name: Register Ironic Nodes
   os_ironic:
