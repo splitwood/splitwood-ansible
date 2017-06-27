@@ -126,7 +126,33 @@
     state: present
 
 - name: Add atomic_image survey to Ironic image template
-  command: /usr/bin/tower-cli job_template modify --name {{ ironic_image_job_template|quote }} --survey-enabled true --survey-spec="{ \"description\":\"\", \"spec\":[ { \"required\":true, \"min\":0, \"default\":\"http://cloud.centos.org/centos/7/atomic/images/CentOS-Atomic-Host-7-GenericCloud.qcow2\", \"max\":1024, \"question_description\":\"\", \"choices\":\"\", \"new_question\":true, \"variable\":\"atomic_image\", \"question_name\":\"Atomic image URL:\", \"type\":\"text\" } ], \"name\":\"\"}"
+  command: /usr/bin/tower-cli job_template modify --name {{ ironic_image_job_template|quote }} --survey-enabled true --survey-spec="{ \"description\":\"\", \"spec\":[ { \"required\":true, \"min\":0, \"default\":\"{{ default_atomic_image }}\", \"max\":1024, \"question_description\":\"\", \"choices\":\"\", \"new_question\":true, \"variable\":\"atomic_image\", \"question_name\":\"Atomic image URL:\", \"type\":\"text\" } ], \"name\":\"\"}"
+
+- name: Create Ironic dhcp template
+  tower_job_template:
+    name: "{{ ironic_dhcp_job_template }}"
+    job_type: run
+    inventory: "{{ ironic_inventory }}"
+    project: "{{ project_ironic }}"
+    playbook: ironic-dnsmasq-dhcp.yml
+    machine_credential: "{{ credentials }}"
+    state: present
+
+- name: Add provisioning_nic survey to Ironic dhcp template
+  command: /usr/bin/tower-cli job_template modify --name {{ ironic_dhcp_job_template|quote }} --survey-enabled true --survey-spec="{ \"description\":\"\", \"spec\":[ { \"required\":false, \"min\":0, \"default\":\"{{ default_provisioning_nic }}\", \"max\":18, \"question_description\":\"\", \"choices\":\"\", \"new_question\":true, \"variable\":\"provisioning_nic\", \"question_name\":\"Interface on Ironic host for the provisioning network:\", \"type\":\"text\" } ], \"name\":\"\"}"
+
+- name: Create Ironic registering template
+  tower_job_template:
+    name: "{{ ironic_registering_job_template }}"
+    job_type: run
+    inventory: "{{ ironic_inventory }}"
+    project: "{{ project_ironic }}"
+    playbook: ironic-node-registration.yml
+    machine_credential: "{{ credentials }}"
+    state: present
+
+- name: Add nodes survey to Ironic registering template
+  command: /usr/bin/tower-cli job_template modify --name {{ ironic_dhcp_job_template|quote }} --survey-enabled true --survey-spec="{  \"description\":\"\",   \"spec\":[    {      \"required\":true,       \"min\":0,       \"default\":\"- name:testnode1\n  driver:pxe_ipmitool\n  driver_info:\n    power:\n      ipmi_username:username\n      ipmi_password:password\n      ipmi_address:127.0.0.1\n      ipmi_port:6234\n  nics:\n    - mac:aa:bb:cc:aa:bb:cc\n  properties:\n    cpus:1\n    cpu_arch:x86_64\n    ram:8192\n    disk_size:40\n    capabilities:profile:baremetal,boot_option:local\n- name:testnode2\n  driver:pxe_ipmitool\n  driver_info:\n    power:\n      ipmi_username:username\n      ipmi_password:password\n      ipmi_address:127.0.0.1\n      ipmi_port:6234\n  nics:\n    - mac:aa:bb:cc:aa:bb:dd\n  properties:\n    cpus:1\n    cpu_arch:x86_64\n    ram:8192\n    disk_size:40\n    capabilities:profile:baremetal,boot_option:local\",       \"max\":65536,       \"question_description\":\"\",       \"choices\":\"\",       \"variable\":\"nodes\",       \"question_name\":\"Nodes to register\",       \"type\":\"textarea\"    }  ],   \"name\":\"\"}"
 
 
 - name: Clean temporary directory
