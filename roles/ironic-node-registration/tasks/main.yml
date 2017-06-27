@@ -71,3 +71,15 @@
     wait: yes
   with_items: "{{ nodes }}"
   when: nodes != []
+
+# resource_class is not available in os_ironic module
+- name: Set resource_class
+  shell: |
+    ironic node-update "{{ item.name }}" replace resource_class="{{ item.resource_class|default("None") }}"
+  environment:
+    IRONIC_URL: "{{ ironic_url }}"
+    OS_AUTH_TOKEN: token
+    IRONIC_API_VERSION: 1.31
+  with_items: "{{ nodes }}"
+  changed_when: False
+  when: nodes != []
