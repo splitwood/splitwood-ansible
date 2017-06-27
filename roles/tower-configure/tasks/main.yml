@@ -26,13 +26,23 @@
     name: "{{ organization }}"
     state: present
 
-- name: Add tower project
+- name: Add tower project for Openshift
   tower_project:
-    name: "{{ project }}"
+    name: "{{ project_openshift }}"
     description: "Deploy Openshift on baremetal hosts provisioned by Ironic"
     scm_type: "git"
     scm_url: "https://github.com/splitwood/openshift-ansible.git"
     scm_branch: "glusterfs-fixes-too"
+    organization: "{{ organization }}"
+    state: present
+    
+- name: Add tower project for Ironic
+  tower_project:
+    name: "{{ project_ironic }}"
+    description: "Deploy baremetal hosts with Ironic"
+    scm_type: "git"
+    scm_url: "https://github.com/splitwood/splitwood-ansible.git"
+    scm_branch: "master"
     organization: "{{ organization }}"
     state: present
 
@@ -42,17 +52,40 @@
     dest: "{{ tmp_folder['path'] }}/id_rsa"
     mode: 0600
 
-- name: Add private key for hosts
+- name: Add private key for provisioned hosts
   tower_credential:
     name: "{{ credentials }}"
     description: "Hosts credentials for Splitwood"
     kind: ssh
-    project: "{{ project }}"
     organization: "{{ organization }}"
     ssh_key_data: "{{ tmp_folder['path'] }}/id_rsa"
     state: present
 
-- name: Add ironic hosts inventory
+- name: Add ironic host inventory
+  tower_inventory:
+    name: "{{ ironic_inventory }}"
+    description: "Ironic Host"
+    organization: "{{ organization }}"
+    state: present
+    
+- name: Add ironic host group (mgmt-server)
+  tower_group:
+    name: mgmt-server
+    description: "Ironic host"
+    inventory: "{{ ironic_inventory }}"
+    state: present
+
+- name: Add ironic host to its inventory
+  tower_host:
+    name: "{{ hostvars['mgmt-server']['ansible_host'] }}"
+    description: "Ironic host"
+    inventory: "{{ ironic_inventory }}"
+    state: present
+
+- name: Associate ironic host with its group
+  command: /usr/bin/tower-cli host associate --host {{ hostvars['mgmt-server']['ansible_host']|quote }} --group mgmt-server
+
+- name: Add ironic provisioned hosts inventory
   tower_inventory:
     name: "{{ inventory }}"
     description: "Hosts inventory for Splitwood"
@@ -72,15 +105,29 @@
 - name: Add tower group
   command: /usr/bin/tower-cli group create --name {{ group|quote }} --force-on-exists --inventory {{ inventory|quote }}  --overwrite true  --overwrite-vars true  --update-on-launch true  --source custom --source-script {{ script|quote }} --source-vars="{ \"IRONIC_API_VERSION\":\"1.31\",  \"OS_AUTH_TOKEN\":\"token\", \"IRONIC_URL\":\"http://{{ hostvars['mgmt-server']['ansible_host']|quote }}:6385\" }"
 
-- name: Create Splitwood job template
+- name: Create Openshift job template
   tower_job_template:
-    name: "{{ job_template }}"
+    name: "{{ openshift_job_template }}"
     job_type: run
     inventory: "{{ inventory }}"
-    project: "{{ project }}"
+    project: "{{ project_openshift }}"
     playbook: playbooks/byo/config.yml
     machine_credential: "{{ credentials }}"
     state: present
+    
+- name: Create Ironic image template
+  tower_job_template:
+    name: "{{ ironic_image_job_template }}"
+    job_type: run
+    inventory: "{{ ironic_inventory }}"
+    project: "{{ project_ironic }}"
+    playbook: ironic-images.yml
+    machine_credential: "{{ credentials }}"
+    state: present
+
+- name: Add atomic_image survey to Ironic image template
+  command: /usr/bin/tower-cli job_template modify --name {{ ironic_image_job_template|quote }} --survey-enabled true --survey-spec="{ \"description\":\"\", \"spec\":[ { \"required\":true, \"min\":0, \"default\":\"http://cloud.centos.org/centos/7/atomic/images/CentOS-Atomic-Host-7-GenericCloud.qcow2\", \"max\":1024, \"question_description\":\"\", \"choices\":\"\", \"new_question\":true, \"variable\":\"atomic_image\", \"question_name\":\"Atomic image URL:\", \"type\":\"text\" } ], \"name\":\"\"}"
+
 
 - name: Clean temporary directory
   file:

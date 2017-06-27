@@ -1,7 +1,10 @@
 organization: Default
-project: Splitwood Openshift
+project_openshift: Splitwood Openshift
+project_ironic: Splitwood Ironic
 credentials: Splitwood Credentials
 inventory: Splitwood Inventory
+ironic_inventory: Ironic Host
 group: Ironic provisioned hosts
 script: Dynamic inventory from Ironic
-job_template: Splitwood deploy Openshift
+openshift_job_template: Splitwood deploy Openshift
+ironic_image_job_template:  Download and stage the necessary images on the Ironic host
