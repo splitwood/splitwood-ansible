@@ -120,7 +120,7 @@ Provisioning Nodes
 
 The followig command will provision a node::
 
-    ansible-playbook -i inventory splitwood-ansible/ironic-node-provision.yml -e node_name=baremetal-0 -e node_ip=192.168.24.15 -e $(cat ~/.ssh/id_rsa.pub)
+    ansible-playbook -i inventory splitwood-ansible/ironic-node-provision.yml -e node_name=baremetal-0 -e node_ip=192.168.24.15 -e ssh_public_key=$(cat ~/.ssh/id_rsa.pub)
 
 Note that ``node_name`` and ``node_ip`` must be specified. For the other
 variables, the default values are shown. For more info see
