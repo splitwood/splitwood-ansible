@@ -1,3 +1,9 @@
+- name: Install genisoimage
+  yum:
+    name: genisoimage
+    state: present
+  become: true
+
 - name: Get node uuid
   shell: |
     ironic --json node-show {{ node_name }} | jq -r .uuid
