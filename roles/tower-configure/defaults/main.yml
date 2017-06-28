@@ -6,9 +6,11 @@ inventory: Splitwood Inventory
 ironic_inventory: Ironic Host
 group: Ironic provisioned hosts
 script: Dynamic inventory from Ironic
-openshift_job_template: 5. Deploy Openshift on provisioned nodes
 ironic_image_job_template:  1. Download and stage the necessary images on the Ironic host
 ironic_dhcp_job_template:  2. Configure DHCP on the provisioning network
-ironic_registering_job_template:  3. Registering nodes
+ironic_register_job_template:  3. Register nodes
+ironic_inspect_job_template:  4. Inspect node
+ironic_provision_job_template:  5. Provision node
+openshift_job_template: 6. Deploy Openshift on provisioned nodes
 default_provisioning_nic: eth1
 default_atomic_image: http://cloud.centos.org/centos/7/atomic/images/CentOS-Atomic-Host-7-GenericCloud.qcow2

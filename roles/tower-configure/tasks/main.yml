@@ -46,11 +46,26 @@
     organization: "{{ organization }}"
     state: present
 
-- name: Copy ssh key
+- name: Copy ssh private keys
   copy:
     src: "{{ ansible_ssh_private_key_file }}"
     dest: "{{ tmp_folder['path'] }}/id_rsa"
     mode: 0600
+
+- name: Copy ssh public keys
+  copy:
+    src: "{{ ansible_ssh_public_key_file }}"
+    dest: "{{ tmp_folder['path'] }}/id_rsa.pub"
+    mode: 0600
+
+- name: Load ssh pub key
+  shell:
+    cat "{{ tmp_folder['path'] }}/id_rsa.pub"
+  register: id_rsa_pub_contents
+  changed_when: False
+
+- set_fact:
+    ssh_public_key: "{{ id_rsa_pub_contents.stdout }}"
 
 - name: Add private key for provisioned hosts
   tower_credential:
@@ -143,7 +158,7 @@
 
 - name: Create Ironic registering template
   tower_job_template:
-    name: "{{ ironic_registering_job_template }}"
+    name: "{{ ironic_register_job_template }}"
     job_type: run
     inventory: "{{ ironic_inventory }}"
     project: "{{ project_ironic }}"
@@ -152,8 +167,33 @@
     state: present
 
 - name: Add nodes survey to Ironic registering template
-  command: /usr/bin/tower-cli job_template modify --name {{ ironic_dhcp_job_template|quote }} --survey-enabled true --survey-spec="{  \"description\":\"\",   \"spec\":[    {      \"required\":true,       \"min\":0,       \"default\":\"- name:testnode1\n  driver:pxe_ipmitool\n  driver_info:\n    power:\n      ipmi_username:username\n      ipmi_password:password\n      ipmi_address:127.0.0.1\n      ipmi_port:6234\n  nics:\n    - mac:aa:bb:cc:aa:bb:cc\n  properties:\n    cpus:1\n    cpu_arch:x86_64\n    ram:8192\n    disk_size:40\n    capabilities:profile:baremetal,boot_option:local\n- name:testnode2\n  driver:pxe_ipmitool\n  driver_info:\n    power:\n      ipmi_username:username\n      ipmi_password:password\n      ipmi_address:127.0.0.1\n      ipmi_port:6234\n  nics:\n    - mac:aa:bb:cc:aa:bb:dd\n  properties:\n    cpus:1\n    cpu_arch:x86_64\n    ram:8192\n    disk_size:40\n    capabilities:profile:baremetal,boot_option:local\",       \"max\":65536,       \"question_description\":\"\",       \"choices\":\"\",       \"variable\":\"nodes\",       \"question_name\":\"Nodes to register\",       \"type\":\"textarea\"    }  ],   \"name\":\"\"}"
+  command: /usr/bin/tower-cli job_template modify --name {{ ironic_register_job_template|quote }} --survey-enabled true --survey-spec="{  \"description\":\"\",   \"name\":\"\",   \"spec\":[    {      \"question_description\":\"\",       \"min\":0,   \"default\":\"{\n  \\\"nodes\\\":\t[\n    {\n      \\\"name\\\":\t\\\"node1\\\",\n      \\\"pm_password\\\":\t\\\"ipmi_secret\\\",\n      \\\"pm_type\\\":\t\\\"pxe_ipmitool\\\",\n      \\\"pm_user\\\":\t\\\"root\\\",\n      \\\"pm_addr\\\":\t\\\"ipmi.node1.example.com\\\",\n      \\\"pm_port\\\":\t\\\"623\\\",\n      \\\"mac\\\":\t[\n        \\\"00:11:22:33:44:55\\\"\n      ],\n      \\\"cpu\\\":\t\\\"2\\\",\n      \\\"memory\\\":\t\\\"4096\\\",\n      \\\"disk\\\":\t\\\"40\\\",\n      \\\"arch\\\":\t\\\"x86_64\\\",\n      \\\"resource_class\\\":\t\\\"openshift_master\\\",\n      \\\"capabilities\\\":\t\\\"profile:baremetal,boot_option:local\\\"\n    },\n    {\n      \\\"name\\\":\t\\\"node2\\\",\n      \\\"pm_password\\\":\t\\\"ipmi_secret\\\",\n      \\\"pm_type\\\":\t\\\"pxe_ipmitool\\\",\n      \\\"pm_user\\\":\t\\\"root\\\",\n      \\\"pm_addr\\\":\t\\\"ipmi.node2.example.com\\\",\n      \\\"pm_port\\\":\t\\\"623\\\",\n      \\\"mac\\\":\t[\n        \\\"00:11:22:33:44:56\\\"\n      ],\n      \\\"cpu\\\":\t\\\"2\\\",\n      \\\"memory\\\":\t\\\"4096\\\",\n      \\\"disk\\\":\t\\\"40\\\",\n      \\\"arch\\\":\t\\\"x86_64\\\",\n      \\\"capabilities\\\":\t\\\"profile:baremetal,boot_option:local\\\"\n    }\n  ]\n}\",    \"max\":65536,       \"required\":true,       \"choices\":\"\",       \"variable\":\"nodes_json_text\",       \"question_name\":\"Nodes to register\",       \"type\":\"textarea\"    }  ]}"
 
+- name: Create Ironic inspect template
+  tower_job_template:
+    name: "{{ ironic_inspect_job_template }}"
+    job_type: run
+    inventory: "{{ ironic_inventory }}"
+    project: "{{ project_ironic }}"
+    playbook: ironic-node-inspect.yml
+    machine_credential: "{{ credentials }}"
+    state: present
+
+- name: Add node_name survey to Ironic inspect template
+  command: /usr/bin/tower-cli job_template modify --name {{ ironic_inspect_job_template|quote }} --survey-enabled true --survey-spec="{ \"description\":\"\", \"spec\":[ { \"required\":true, \"min\":0, \"default\":\"\", \"max\":255, \"question_description\":\"\", \"choices\":\"\", \"new_question\":true, \"variable\":\"node_name\", \"question_name\":\"Node name:\", \"type\":\"text\" } ], \"name\":\"\"}"
+
+- name: Create Ironic provision template
+  tower_job_template:
+    name: "{{ ironic_provision_job_template }}"
+    job_type: run
+    inventory: "{{ ironic_inventory }}"
+    project: "{{ project_ironic }}"
+    playbook: ironic-node-provision.yml
+    machine_credential: "{{ credentials }}"
+    state: present
+
+- name: Add node_name survey to Ironic provision template
+  command: /usr/bin/tower-cli job_template modify --name {{ ironic_provision_job_template|quote }} --survey-enabled true --survey-spec="{  \"description\":\"\",   \"spec\":[    {      \"required\":true,       \"min\":0,       \"default\":\"\",       \"max\":255,       \"question_description\":\"\",       \"choices\":\"\",       \"new_question\":true,       \"variable\":\"node_name\",       \"question_name\":\"Node name:\",       \"type\":\"text\"    },     {      \"required\":true,       \"min\":0,       \"default\":\"\",       \"max\":15,       \"question_description\":\"\",       \"choices\":\"\",       \"new_question\":true,       \"variable\":\"node_ip\",       \"question_name\":\"Node IP\",       \"type\":\"text\"    },     {      \"required\":true,       \"min\":0,       \"default\":\"{{ ssh_public_key }}\",       \"max\":8192,       \"question_description\":\"\",       \"choices\":\"\",       \"new_question\":true,       \"variable\":\"ssh_public_key\",       \"question_name\":\"SSH public key\",       \"type\":\"text\"    }  ],   \"name\":\"\"}"
 
 - name: Clean temporary directory
   file:
